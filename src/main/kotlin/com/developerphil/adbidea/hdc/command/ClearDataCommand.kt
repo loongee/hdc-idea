@@ -6,7 +6,7 @@ import com.developerphil.adbidea.ui.NotificationHelper.info
 
 /**
  * 清除应用数据命令
- * 使用 HDC: bm clean -n <bundleName> -c -d
+ * 使用 HDC: bm clean -n <bundleName> (-c|-d)
  */
 class ClearDataCommand : Command {
     override fun run(context: CommandContext): Boolean = with(context) {

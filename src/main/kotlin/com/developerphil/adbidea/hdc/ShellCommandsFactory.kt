@@ -43,7 +43,7 @@ object ShellCommandsFactory {
      * @return shell 命令字符串
      */
     @JvmStatic
-    fun clearAppData(bundleName: String, clearCache: Boolean = true, clearData: Boolean = true): String {
+    fun clearAppData(bundleName: String, clearCache: Boolean = false, clearData: Boolean = true): String {
         val flags = buildString {
             if (clearCache) append("-c ")
             if (clearData) append("-d ")
