@@ -1,0 +1,87 @@
+#!/bin/bash
+
+# HDC Idea Plugin Build Script
+# This script builds the HDC version of the plugin for DevEco Studio
+
+set -e
+
+echo "============================================="
+echo "  HDC Idea Plugin Builder"
+echo "============================================="
+echo ""
+
+# Check if gradle wrapper exists
+if [ ! -f "./gradlew" ]; then
+    echo "Error: gradlew not found. Please run this script from the project root."
+    exit 1
+fi
+
+# Parse arguments
+BUILD_TYPE="hdc"
+CLEAN=false
+
+while [[ $# -gt 0 ]]; do
+    case $1 in
+        --adb)
+            BUILD_TYPE="adb"
+            shift
+            ;;
+        --clean)
+            CLEAN=true
+            shift
+            ;;
+        --help)
+            echo "Usage: $0 [options]"
+            echo ""
+            echo "Options:"
+            echo "  --adb     Build original ADB version (default: HDC)"
+            echo "  --clean   Clean before build"
+            echo "  --help    Show this help message"
+            exit 0
+            ;;
+        *)
+            echo "Unknown option: $1"
+            exit 1
+            ;;
+    esac
+done
+
+# Clean if requested
+if [ "$CLEAN" = true ]; then
+    echo "Cleaning build directory..."
+    ./gradlew clean
+    echo ""
+fi
+
+# Build the plugin
+if [ "$BUILD_TYPE" = "hdc" ]; then
+    echo "Building HDC version (for DevEco Studio)..."
+    echo ""
+    ./gradlew -PbuildHdc=true build
+    
+    echo ""
+    echo "============================================="
+    echo "  Build Complete!"
+    echo "============================================="
+    echo ""
+    echo "HDC version built successfully!"
+    echo "Plugin JAR location: build/libs/"
+    echo ""
+    echo "To install:"
+    echo "1. Open DevEco Studio"
+    echo "2. Go to Settings/Preferences → Plugins"
+    echo "3. Click ⚙️ → Install Plugin from Disk..."
+    echo "4. Select the JAR file from build/libs/"
+else
+    echo "Building ADB version (for Android Studio)..."
+    echo ""
+    ./gradlew build
+    
+    echo ""
+    echo "============================================="
+    echo "  Build Complete!"
+    echo "============================================="
+    echo ""
+    echo "ADB version built successfully!"
+    echo "Plugin JAR location: build/libs/"
+fi
