@@ -17,15 +17,10 @@ if [ ! -f "./gradlew" ]; then
 fi
 
 # Parse arguments
-BUILD_TYPE="hdc"
 CLEAN=false
 
 while [[ $# -gt 0 ]]; do
     case $1 in
-        --adb)
-            BUILD_TYPE="adb"
-            shift
-            ;;
         --clean)
             CLEAN=true
             shift
@@ -54,34 +49,20 @@ if [ "$CLEAN" = true ]; then
 fi
 
 # Build the plugin
-if [ "$BUILD_TYPE" = "hdc" ]; then
-    echo "Building HDC version (for DevEco Studio)..."
-    echo ""
-    ./gradlew -PbuildHdc=true build
-    
-    echo ""
-    echo "============================================="
-    echo "  Build Complete!"
-    echo "============================================="
-    echo ""
-    echo "HDC version built successfully!"
-    echo "Plugin JAR location: build/libs/"
-    echo ""
-    echo "To install:"
-    echo "1. Open DevEco Studio"
-    echo "2. Go to Settings/Preferences → Plugins"
-    echo "3. Click ⚙️ → Install Plugin from Disk..."
-    echo "4. Select the JAR file from build/libs/"
-else
-    echo "Building ADB version (for Android Studio)..."
-    echo ""
-    ./gradlew build
-    
-    echo ""
-    echo "============================================="
-    echo "  Build Complete!"
-    echo "============================================="
-    echo ""
-    echo "ADB version built successfully!"
-    echo "Plugin JAR location: build/libs/"
-fi
+echo "Building HDC version (for DevEco Studio)..."
+echo ""
+./gradlew -PbuildHdc=true build
+
+echo ""
+echo "============================================="
+echo "  Build Complete!"
+echo "============================================="
+echo ""
+echo "HDC version built successfully!"
+echo "Plugin JAR location: build/libs/"
+echo ""
+echo "To install:"
+echo "1. Open DevEco Studio"
+echo "2. Go to Settings/Preferences → Plugins"
+echo "3. Click ⚙️ → Install Plugin from Disk..."
+echo "4. Select the JAR file from build/libs/"

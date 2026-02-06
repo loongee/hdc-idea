@@ -1,64 +1,180 @@
-ADB Idea
-========
+# HDC Idea - HarmonyOS Device Controller Plugin
 
-A plugin for Android Studio and Intellij IDEA that speeds up your day to day android development.
+A plugin for DevEco Studio to speed up your day-to-day HarmonyOS/OpenHarmony development.
 
-The following commands are provided:
+This plugin is a port of the popular [ADB Idea](https://github.com/pbreault/adb-idea) plugin, adapted for HarmonyOS development using HDC (HarmonyOS Device Controller) commands.
+![logo](./website/hdc_operations_popup.png)
 
-* Uninstall App
-* Kill App
-* Start App
-* Restart App
-* Clear App Data
-* Clear App Data and Restart
+## Features
 
-Usage
-=====
+| Feature | HDC Command |
+|---------|-------------|
+| **Uninstall App** | `hdc uninstall <bundleName>` |
+| **Kill App** | `hdc shell aa force-stop <bundleName>` |
+| **Start App** | `hdc shell aa start -b <bundleName> -a <abilityName>` |
+| **Restart App** | Kill + Start |
+| **Clear App Data** | `hdc shell bm clean -n <bundleName> -c -d` |
+| **Clear App Data and Restart** | Clear Data + Start |
+| **Start App With Debugger** | `hdc shell aa start -D -b <bundleName> -a <abilityName>` |
+| **Restart App With Debugger** | Kill + Start with Debugger |
+| **Grant Permissions** | `hdc shell bm grant -n <bundleName> -p <permission>` |
+| **Revoke Permissions** | `hdc shell bm revoke -n <bundleName> -p <permission>` |
+| **Revoke Permissions and Restart** | Revoke + Start |
 
-Quick Operations Popup
------------------
+## Usage
 
-The number on the left is a shortcut that will stay the same for your muscle memory pleasure.
+There are two ways to invoke commands:
 
-* Mac OSX: Ctrl+Shift+A
-* Windows/Linux: Ctrl+Alt+Shift+A
+1. **Menu**: `Tools` → `HDC Idea` → Select command
+2. **Quick Actions**: 
+   - macOS: `Cmd + Shift + H`
+   - Windows/Linux: `Ctrl + Shift + Alt + H`
+3. **Find Actions**: Search for "HDC" in Find Actions (`Cmd/Ctrl + Shift + A`)
+![LOGO](./website/hdc_find_actions.png)
 
-![Logo](website/adb_operations_popup.png)
+## HDC vs ADB Command Mapping
 
-Find Actions
------------------
-Each command is prefixed by "ADB", so you can quickly filter through adb commands using the "[Find Actions](http://www.jetbrains.com/idea/webhelp/navigating-to-action.html)" shortcut.
+| Concept | Android (ADB) | HarmonyOS (HDC) |
+|---------|---------------|-----------------|
+| App Identifier | Package Name | Bundle Name |
+| Entry Component | Activity | Ability |
+| App Package Format | APK | HAP |
+| Activity Manager | `am` | `aa` (Ability Assistant) |
+| Package Manager | `pm` | `bm` (Bundle Manager) |
+| List Devices | `adb devices` | `hdc list targets` |
+| Connect Device | `adb connect` | `hdc tconn` |
+| File Push | `adb push` | `hdc file send` |
+| File Pull | `adb pull` | `hdc file recv` |
 
-![Logo](website/find_actions.png)
+## Installation
 
-The Menu Way
-------------
-You can find every command in the following menu:
-`Tools->Android->ADB Idea`
+### From Local Build
 
+1. Clone this repository
+2. Build the HDC version:
+   ```bash
+   ./gradlew -PbuildHdc=true build
+   ```
+3. Install the plugin in DevEco Studio:
+   - Go to `Settings/Preferences` → `Plugins` → `⚙️` → `Install Plugin from Disk...`
+   - Select the built plugin JAR from `build/libs/`
 
-Installation
-========
+### Prerequisites
 
-Download and install *ADB Idea* directly from Intellij / Android Studio:
-`Preferences/Settings->Plugins->Browse Repositories`
+- DevEco Studio 3.0 or later
+- HarmonyOS SDK with HDC tool
+- Set one of the following environment variables:
+  - `HDC_HOME`: Path to HDC executable directory
+  - `DEVECO_SDK_HOME`: Path to DevEco SDK
+  - `HarmonyOS_SDK_HOME`: Path to HarmonyOS SDK
 
-Alternatively, you can [download the plugin](http://plugins.jetbrains.com/plugin/7380?pr=idea) from the jetbrains plugin site and install it manually in:
-`Preferences/Settings->Plugins->Install plugin from disk`
+## Configuration
 
-License
-=======
+The plugin automatically detects HDC from these locations (in order):
 
-    Copyright 2017 Philippe Breault
+1. `HDC_HOME` environment variable
+2. `DEVECO_SDK_HOME/toolchains/hdc`
+3. `HarmonyOS_SDK_HOME/toolchains/hdc`
+4. Default installation paths:
+   - macOS: `/Applications/DevEco-Studio.app/Contents/sdk/toolchains/hdc`
+   - Windows: `%LOCALAPPDATA%\Huawei\sdk\toolchains\hdc.exe`
+   - Linux: `/opt/Huawei/DevEco-Studio/sdk/toolchains/hdc`
+5. System PATH
 
-    Licensed under the Apache License, Version 2.0 (the "License");
-    you may not use this file except in compliance with the License.
-    You may obtain a copy of the License at
+## Project Configuration
 
-       http://www.apache.org/licenses/LICENSE-2.0
+The plugin reads the Bundle Name and Main Ability from your project's configuration files:
 
-    Unless required by applicable law or agreed to in writing, software
-    distributed under the License is distributed on an "AS IS" BASIS,
-    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-    See the License for the specific language governing permissions and
-    limitations under the License.
+- **Stage Model**: `entry/src/main/module.json5` and `AppScope/app.json5`
+- **FA Model**: `entry/src/main/config.json`
+
+Example `app.json5`:
+```json
+{
+  "app": {
+    "bundleName": "com.example.myapp",
+    "vendor": "example",
+    "versionCode": 1000000,
+    "versionName": "1.0.0"
+  }
+}
+```
+
+Example `module.json5`:
+```json
+{
+  "module": {
+    "name": "entry",
+    "type": "entry",
+    "mainElement": "EntryAbility",
+    "abilities": [
+      {
+        "name": "EntryAbility",
+        "srcEntry": "./ets/entryability/EntryAbility.ets"
+      }
+    ]
+  }
+}
+```
+
+## Building from Source
+
+### Build ADB Version (Original)
+```bash
+./gradlew build
+```
+
+### Build HDC Version (HarmonyOS)
+```bash
+./gradlew -PbuildHdc=true build
+```
+
+Or use the provided build script:
+```bash
+cp build.gradle.hdc.kts build.gradle.kts
+./gradlew build
+```
+
+## Differences from ADB Idea
+
+| Feature | ADB Idea | HDC Idea |
+|---------|----------|----------|
+| WiFi Control | ✅ Supported | ❌ Not available |
+| Mobile Data Control | ✅ Supported | ❌ Not available |
+| Debugger Attachment | ✅ Full support | ⚠️ Basic support |
+| Device Selection | Android Device Chooser | Custom HDC Device Chooser |
+
+## Troubleshooting
+
+### HDC not found
+- Ensure HarmonyOS SDK is properly installed
+- Set the `HDC_HOME` environment variable to point to the HDC directory
+- Verify HDC works by running `hdc list targets` in terminal
+
+### Bundle Name not detected
+- Make sure your project has a valid `app.json5` or `config.json`
+- Check that `bundleName` is correctly specified in the configuration
+
+### Device not found
+- Connect your HarmonyOS device via USB or WiFi
+- Enable Developer Mode on the device
+- Run `hdc list targets` to verify device connectivity
+
+## Contributing
+
+Contributions are welcome! Please feel free to submit a Pull Request.
+
+## License
+
+This project is licensed under the same license as the original ADB Idea plugin.
+
+## Credits
+
+- Original [ADB Idea](https://github.com/pbreault/adb-idea) plugin by Philippe Breault
+- HarmonyOS/OpenHarmony port by the community
+
+## Related Projects
+
+- [ADB Idea](https://github.com/pbreault/adb-idea) - Original Android plugin
+- [DevEco Studio](https://developer.harmonyos.com/cn/develop/deveco-studio) - HarmonyOS IDE
+- [HDC Documentation](https://gitee.com/openharmony/developtools_hdc) - OpenHarmony HDC Tool

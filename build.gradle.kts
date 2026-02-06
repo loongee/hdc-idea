@@ -4,8 +4,6 @@ import org.jetbrains.changelog.Changelog.OutputType.MARKDOWN
 
 plugins {
     // Must match the Kotlin version bundled with the IDE
-    // https://plugins.jetbrains.com/docs/intellij/using-kotlin.html#kotlin-standard-library
-    // https://plugins.jetbrains.com/docs/intellij/android-studio-releases-list.html
     id("org.jetbrains.kotlin.jvm") version "2.2.20"
 
     // https://github.com/JetBrains/intellij-platform-gradle-plugin
@@ -19,8 +17,8 @@ plugins {
 
     // https://github.com/JetBrains/gradle-changelog-plugin
     id("org.jetbrains.changelog") version "2.2.1"
-
 }
+
 repositories {
     mavenCentral()
     intellijPlatform {
@@ -28,10 +26,13 @@ repositories {
     }
 }
 
+// 是否构建 HDC 版本
+val buildHdcVersion: Boolean = project.findProperty("buildHdc")?.toString()?.toBoolean() ?: false
+
 intellijPlatform {
     pluginConfiguration {
-        name = "adb_idea"
-        group = "com.developerphil.intellij.plugin.adbidea"
+        name = "hdc_idea"
+        group = "com.loongee.intellij.plugin.hdcidea"
         changeNotes.set(provider { recentChanges(HTML) })
         ideaVersion.sinceBuild.set(project.property("sinceBuild").toString())
         ideaVersion.untilBuild.set(provider { null })
@@ -41,7 +42,7 @@ intellijPlatform {
 }
 
 changelog {
-    repositoryUrl.set("https://github.com/pbreault/adb-idea")
+    repositoryUrl.set("https://github.com/loongee/hdc-idea")
     itemPrefix.set("-")
     keepUnreleasedSection.set(true)
     unreleasedTerm.set("[Unreleased]")
@@ -69,6 +70,7 @@ tasks.register("printLastChanges") {
         println(recentChanges(outputType = HTML))
     }
 }
+
 val localIdePath: String? by project.extra
 localIdePath?.let {
     val runLocalIde by intellijPlatformTesting.runIde.registering {
@@ -78,14 +80,14 @@ localIdePath?.let {
 
 dependencies {
     intellijPlatform {
-        bundledPlugin("org.jetbrains.android")
         instrumentationTools()
+
+        bundledPlugin("org.jetbrains.android")
         if (project.hasProperty("localIdeOverride")) {
             local(property("localIdeOverride").toString())
         } else {
             androidStudio(property("ideVersion").toString())
         }
-
     }
 
     implementation("org.jooq:joor:0.9.15")
@@ -108,3 +110,12 @@ fun recentChanges(outputType: Changelog.OutputType): String {
     return s
 }
 
+// 添加 HDC 构建任务
+tasks.register("buildHdc") {
+    group = "build"
+    description = "Build HDC version of the plugin for DevEco Studio"
+    dependsOn("build")
+    doFirst {
+        project.extra["buildHdc"] = true
+    }
+}
