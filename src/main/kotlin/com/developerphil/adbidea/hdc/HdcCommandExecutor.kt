@@ -3,9 +3,9 @@ package com.developerphil.adbidea.hdc
 import com.intellij.openapi.diagnostic.Logger
 import com.intellij.openapi.project.Project
 import java.io.BufferedReader
-import java.io.File
 import java.io.InputStreamReader
 import java.util.concurrent.TimeUnit
+import com.huawei.deveco.hdclib.ohos.hdc.HarmonyDebugConnector
 
 /**
  * HDC 命令执行器
@@ -37,80 +37,7 @@ class HdcCommandExecutor(private val project: Project) {
      * 获取 HDC 可执行文件路径
      */
     fun getHdcPath(): String? {
-        // 1. 首先检查环境变量 HDC_HOME
-        System.getenv(HDC_HOME_ENV)?.let { hdcHome ->
-            val hdcPath = findHdcInPath(hdcHome)
-            if (hdcPath != null) return hdcPath
-        }
-
-        // 2. 检查 DevEco SDK 路径
-        System.getenv(DEVECO_SDK_HOME_ENV)?.let { sdkHome ->
-            val hdcPath = findHdcInSdk(sdkHome)
-            if (hdcPath != null) return hdcPath
-        }
-
-        // 3. 检查 HarmonyOS SDK 路径
-        System.getenv(HARMONY_SDK_HOME_ENV)?.let { sdkHome ->
-            val hdcPath = findHdcInSdk(sdkHome)
-            if (hdcPath != null) return hdcPath
-        }
-
-        // 4. 检查默认路径
-        val defaultPaths = listOf(
-            // macOS
-            "/Applications/DevEco-Studio.app/Contents/sdk/toolchains/hdc",
-            "${System.getProperty("user.home")}/Library/Huawei/sdk/toolchains/hdc",
-            // Windows
-            "${System.getenv("LOCALAPPDATA")}\\Huawei\\sdk\\toolchains\\hdc.exe",
-            "C:\\Program Files\\Huawei\\DevEco Studio\\sdk\\toolchains\\hdc.exe",
-            // Linux
-            "/opt/Huawei/DevEco-Studio/sdk/toolchains/hdc",
-            "${System.getProperty("user.home")}/Huawei/sdk/toolchains/hdc"
-        )
-
-        for (path in defaultPaths) {
-            val file = File(path)
-            if (file.exists() && file.canExecute()) {
-                return path
-            }
-        }
-
-        // 5. 尝试从 PATH 中查找
-        return findHdcInSystemPath()
-    }
-
-    private fun findHdcInPath(basePath: String): String? {
-        val hdcName = if (isWindows()) "hdc.exe" else "hdc"
-        val hdcFile = File(basePath, hdcName)
-        return if (hdcFile.exists() && hdcFile.canExecute()) hdcFile.absolutePath else null
-    }
-
-    private fun findHdcInSdk(sdkHome: String): String? {
-        val hdcName = if (isWindows()) "hdc.exe" else "hdc"
-        val possiblePaths = listOf(
-            File(sdkHome, "toolchains/$hdcName"),
-            File(sdkHome, "hdc/$hdcName"),
-            File(sdkHome, "tools/$hdcName")
-        )
-        return possiblePaths.firstOrNull { it.exists() && it.canExecute() }?.absolutePath
-    }
-
-    private fun findHdcInSystemPath(): String? {
-        val pathEnv = System.getenv("PATH") ?: return null
-        val pathSeparator = if (isWindows()) ";" else ":"
-        val hdcName = if (isWindows()) "hdc.exe" else "hdc"
-
-        for (dir in pathEnv.split(pathSeparator)) {
-            val hdcFile = File(dir, hdcName)
-            if (hdcFile.exists() && hdcFile.canExecute()) {
-                return hdcFile.absolutePath
-            }
-        }
-        return null
-    }
-
-    private fun isWindows(): Boolean {
-        return System.getProperty("os.name").lowercase().contains("win")
+        return HarmonyDebugConnector.getHdcConnector().hdcPath
     }
 
     /**

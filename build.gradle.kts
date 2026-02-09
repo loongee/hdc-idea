@@ -26,9 +26,6 @@ repositories {
     }
 }
 
-// 是否构建 HDC 版本
-val buildHdcVersion: Boolean = project.findProperty("buildHdc")?.toString()?.toBoolean() ?: false
-
 intellijPlatform {
     pluginConfiguration {
         name = "hdc_idea"
@@ -71,8 +68,8 @@ tasks.register("printLastChanges") {
     }
 }
 
-val localIdePath: String? by project.extra
-localIdePath?.let {
+val localIdePath: String by project.extra
+localIdePath.let {
     val runLocalIde by intellijPlatformTesting.runIde.registering {
         localPath.set(file(it))
     }
@@ -82,12 +79,18 @@ dependencies {
     intellijPlatform {
         instrumentationTools()
 
-        bundledPlugin("org.jetbrains.android")
         if (project.hasProperty("localIdeOverride")) {
             local(property("localIdeOverride").toString())
         } else {
-            androidStudio(property("ideVersion").toString())
+            local(localIdePath)
         }
+        // 依赖 DevEco Studio 自带的 OpenHarmony 插件（不在 JetBrains 仓库，需用 localPlugin 指向本地）
+        val idePath = if (project.hasProperty("localIdeOverride")) {
+            property("localIdeOverride").toString()
+        } else {
+            localIdePath
+        }
+        localPlugin(file(idePath).resolve("plugins/openharmony").absolutePath)
     }
 
     implementation("org.jooq:joor:0.9.15")
@@ -115,7 +118,4 @@ tasks.register("buildHdc") {
     group = "build"
     description = "Build HDC version of the plugin for DevEco Studio"
     dependsOn("build")
-    doFirst {
-        project.extra["buildHdc"] = true
-    }
 }

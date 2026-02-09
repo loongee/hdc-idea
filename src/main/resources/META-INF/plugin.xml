@@ -44,6 +44,7 @@
         ]]></description>
 
     <depends>com.intellij.modules.platform</depends>
+    <depends>com.huawei.ohos</depends>
 
     <actions>
         <group description="HDC Idea" id="HdcIdea" popup="true" text="_HDC Idea">
@@ -51,9 +52,9 @@
                     description="List all the HDC idea operations in a popup"
                     id="com.developerphil.adbidea.action.hdc.HdcIdeaQuickList"
                     text="HDC Operations Popup...">
-                <keyboard-shortcut first-keystroke="shift ctrl H" keymap="Mac OS X" />
-                <keyboard-shortcut first-keystroke="shift ctrl H" keymap="Mac OS X 10.5+" />
-                <keyboard-shortcut first-keystroke="shift ctrl alt H" keymap="$default" />
+                <keyboard-shortcut first-keystroke="shift ctrl A" keymap="Mac OS X" />
+                <keyboard-shortcut first-keystroke="shift ctrl A" keymap="Mac OS X 10.5+" />
+                <keyboard-shortcut first-keystroke="shift ctrl alt A" keymap="$default" />
             </action>
             <separator />
 
@@ -101,21 +102,6 @@
                     description="Clears the private storage of the app and restarts it"
                     id="com.developerphil.adbidea.action.hdc.ClearDataAndRestartAction"
                     text="HDC Clear App Data and Restart" />
-
-            <action class="com.developerphil.adbidea.action.hdc.StartWithDebuggerAction"
-                    description="Starts the current application and attach the debugger"
-                    id="com.developerphil.adbidea.action.hdc.StartWithDebuggerAction"
-                    text="HDC Start App With Debugger" />
-
-            <action class="com.developerphil.adbidea.action.hdc.RestartWithDebuggerAction"
-                    description="Restarts the current application and attach the debugger"
-                    id="com.developerphil.adbidea.action.hdc.RestartWithDebuggerAction"
-                    text="HDC Restart App With Debugger" />
-
-            <action class="com.developerphil.adbidea.action.hdc.ClearDataAndRestartWithDebuggerAction"
-                    description="Clears the private storage of the app and restarts it, and attach the debugger"
-                    id="com.developerphil.adbidea.action.hdc.ClearDataAndRestartWithDebuggerAction"
-                    text="HDC Clear App Data and Restart App With Debugger" />
 
             <add-to-group anchor="last" group-id="ToolsMenu" />
         </group>

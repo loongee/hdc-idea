@@ -51,7 +51,7 @@ fi
 # Build the plugin
 echo "Building HDC version (for DevEco Studio)..."
 echo ""
-./gradlew -PbuildHdc=true build
+./gradlew build
 
 echo ""
 echo "============================================="

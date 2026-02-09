@@ -1,6 +1,7 @@
 package com.developerphil.adbidea.hdc
 
 import com.intellij.openapi.project.Project
+import com.huawei.deveco.hdclib.ohos.hdc.HarmonyDebugConnector
 
 /**
  * HDC 桥接接口
@@ -35,7 +36,9 @@ class HdcBridgeImpl(private val project: Project) : HdcBridge {
     }
 
     override fun connectedDevices(): List<HdcDevice> {
-        return commandExecutor.listDevices()
+        return HarmonyDebugConnector.getHdcConnector().devices.map {
+            HdcDevice(it.serialNumber, it.deviceName)
+        }
     }
 
     override fun getHdcPath(): String? {

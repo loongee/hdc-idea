@@ -3,6 +3,7 @@
 A plugin for DevEco Studio to speed up your day-to-day HarmonyOS/OpenHarmony development.
 
 This plugin is a port of the popular [ADB Idea](https://github.com/pbreault/adb-idea) plugin, adapted for HarmonyOS development using HDC (HarmonyOS Device Controller) commands.
+
 ![logo](./website/hdc_operations_popup.png)
 
 ## Features
@@ -30,6 +31,7 @@ There are two ways to invoke commands:
    - macOS: `Cmd + Shift + H`
    - Windows/Linux: `Ctrl + Shift + Alt + H`
 3. **Find Actions**: Search for "HDC" in Find Actions (`Cmd/Ctrl + Shift + A`)
+
 ![LOGO](./website/hdc_find_actions.png)
 
 ## HDC vs ADB Command Mapping
@@ -53,7 +55,7 @@ There are two ways to invoke commands:
 1. Clone this repository
 2. Build the HDC version:
    ```bash
-   ./gradlew -PbuildHdc=true build
+   ./gradlew build
    ```
 3. Install the plugin in DevEco Studio:
    - Go to `Settings/Preferences` → `Plugins` → `⚙️` → `Install Plugin from Disk...`
@@ -126,7 +128,7 @@ Example `module.json5`:
 
 ### Build HDC Version (HarmonyOS)
 ```bash
-./gradlew -PbuildHdc=true build
+./gradlew build
 ```
 
 Or use the provided build script:
